@@ -174,6 +174,47 @@ export default new Router({
                     component: resolve => { require(['../components/page/StepRulesTable.vue'], resolve)},
                     meta: { title: '规则管理' }
                 },
+                {
+                    path: '/ShopBannerTable',
+                    component: resolve => { require(['../components/page/ShopBannerTable.vue'], resolve)},
+                    meta: { title: '轮播图管理' }
+                },
+                {
+                    path: '/ShopHomeMenuTable',
+                    component: resolve => { require(['../components/page/ShopHomeMenuTable.vue'], resolve)},
+                    meta: { title: '首页菜单管理' }
+                },{
+                    path: '/ShopCommodityCategoryTable',
+                    component: resolve => { require(['../components/page/ShopCommodityCategoryTable.vue'], resolve)},
+                    meta: { title: '商品分类' }
+                },{
+                    path: '/ShopCommodityTable',
+                    component: resolve => { require(['../components/page/ShopCommodityTable.vue'], resolve)},
+                    meta: { title: '商品列表' }
+                },{
+                    path: '/ShopConfigForm',
+                    component: resolve => { require(['../components/page/ShopConfigForm.vue'], resolve)},
+                    meta: { title: '基本配置' }
+                },{
+                    path: '/ShopCaseMenuTable',
+                    component: resolve => { require(['../components/page/ShopCaseMenuTable.vue'], resolve)},
+                    meta: { title: '日记分类' }
+                },
+                {
+                    path: '/ShopCaseTable',
+                    component: resolve => { require(['../components/page/ShopCaseTable.vue'], resolve)},
+                    meta: { title: '日记列表' }
+                },
+                {
+                    path: '/ShopUserTable',
+                    component: resolve => { require(['../components/page/ShopUserTable.vue'], resolve)},
+                    meta: { title: '用户管理' }
+                },
+                {
+                    path: '/ShopOrderTable',
+                    component: resolve => { require(['../components/page/ShopOrderTable.vue'], resolve)},
+                    meta: { title: '订单管理' }
+                },
             ]
         },
         {

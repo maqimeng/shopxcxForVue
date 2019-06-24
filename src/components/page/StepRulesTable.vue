@@ -16,14 +16,34 @@
     import 'quill/dist/quill.core.css';
     import 'quill/dist/quill.snow.css';
     import 'quill/dist/quill.bubble.css';
-    import { quillEditor } from 'vue-quill-editor';
+    import {quillEditor, Quill} from 'vue-quill-editor'
+    import {container, ImageExtend, QuillWatch} from 'quill-image-extend-module';
+    Quill.register('modules/ImageExtend', ImageExtend)
     export default {
         name: 'editor',
         data: function(){
             return {
                 content: '',
+                // 富文本框参数设置
                 editorOption: {
-                    placeholder: '请输入内容'
+                    modules: {
+                        ImageExtend: {
+                            loading: true,
+                            name: 'image',
+                            action: this.$api.uploadUrl+"/Images/uploadEditorImage",
+                            response: (res) => {
+                                return res.data
+                            }
+                        },
+                        toolbar: {
+                            container: container,
+                            handlers: {
+                                'image': function () {
+                                    QuillWatch.emit(this.quill.id)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -39,9 +59,9 @@
             },
             getData() {
                 this.$api.post('StepRules/getRulesList', null, res => {
-                    console.log(res);
+                    // console.log(res);
                     this.content=this.escapeStringHTML(res.data.list.content);
-                    // console.log(this.content);
+                    console.log(this.content);
                 }, err => {
                     this.$message.error(err.msg);
                 });
@@ -49,6 +69,7 @@
             escapeStringHTML(str) {
                 str = str.replace(/&lt;/g,'<');
                 str = str.replace(/&gt;/g,'>');
+                str = str.replace(/&quot;/g,'"');
                 return str;
             },
             submit(){

@@ -20,6 +20,7 @@ function toType (obj) {
 //         } else if (toType(o[key]) === 'object') {
 //             o[key] = filterNull(o[key])
 //         } else if (toType(o[key]) === 'array') {
+
 //             o[key] = filterNull(o[key])
 //         }
 //     }
@@ -69,7 +70,7 @@ function apiAxios (method, url, params, success, failure) {
         .catch(function (err) {
             let res = err.response
             if (err) {
-                // console.log(111);
+                console.log(err);
                 window.alert('api error, HTTP CODE: ' + res.status)
             }
         })

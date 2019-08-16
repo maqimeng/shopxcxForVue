@@ -1,8 +1,8 @@
 // 配置API接口地址
-// var root = 'http://shopxcx.com/index.php/Admin';
-// var uploadUrl = 'http://shopxcx.com/index.php/Common';
-var root = 'https://xaxcx.17mall.cc/index.php/Admin';
-var uploadUrl = 'https://xaxcx.17mall.cc/index.php/Common';
+var root = 'http://shopxcx.com/index.php/Admin';
+var uploadUrl = 'http://shopxcx.com/index.php/Common';
+// var root = 'https://xaxcx.17mall.cc/index.php/Admin';
+// var uploadUrl = 'https://xaxcx.17mall.cc/index.php/Common';
 // 引用axios
 var axios = require('axios');
 // 自定义判断元素类型JS

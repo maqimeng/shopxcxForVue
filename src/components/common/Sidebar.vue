@@ -135,7 +135,7 @@
                 userId: JSON.parse(localStorage.getItem('userInfo')).id
             });
             this.$api.post('Menu/getMenuList', params, res => {
-                console.log(res);
+                // console.log(res);
                 this.items=res.data;
             },err => {
                 // this.$message.error(err.msg);

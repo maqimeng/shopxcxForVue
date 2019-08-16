@@ -7,7 +7,7 @@
         </div>
         <div class="container">
             <div class="form-box">
-                <el-form ref="form" :model="form" label-width="80px">
+                <el-form ref="form" :model="form" label-width="170px">
                     <el-form-item label="医院名称">
                         <el-input v-model="form.hospitalname" placeholder="请输入医院名称"></el-input>
                     </el-form-item>
@@ -86,6 +86,15 @@
                         </el-upload>
                         <span style="color:red">建议尺寸1125*672</span>
                     </el-form-item>
+                    <el-form-item label="每日签到赠送积分数量">
+                        <el-input v-model="form.integral" placeholder="请输入每日签到赠送积分数量"></el-input>
+                    </el-form-item>
+                    <el-form-item label="艺星详情">
+                        <quill-editor ref="myTextEditor" style="width:1000px;" v-model="form.yestardetails" :options="editorOption"></quill-editor>
+                        <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
+                    </el-form-item>
+
+
                     <el-form-item>
                         <el-button type="primary" @click="onSubmit">确定</el-button>
                     </el-form-item>
@@ -97,8 +106,17 @@
 </template>
 
 <script>
+    import 'quill/dist/quill.core.css';
+    import 'quill/dist/quill.snow.css';
+    import 'quill/dist/quill.bubble.css';
+    import {quillEditor, Quill} from 'vue-quill-editor'
+    import {container, ImageExtend, QuillWatch} from 'quill-image-extend-module';
+    Quill.register('modules/ImageExtend', ImageExtend)
     export default {
         name: 'baseform',
+        components: {
+            quillEditor
+        },
         data: function(){
             return {
                 form:{
@@ -116,14 +134,40 @@
                     lat: '',
                     lng: '',
                     city: '',
+                    integral: '',
+                    yestardetails: '',
                 },
                 loading:false,
+                // 富文本框参数设置
+                editorOption: {
+                    modules: {
+                        ImageExtend: {
+                            loading: true,
+                            name: 'image',
+                            action: this.$api.uploadUrl+"/Images/uploadEditorImage",
+                            response: (res) => {
+                                return res.data
+                            }
+                        },
+                        toolbar: {
+                            container: container,
+                            handlers: {
+                                'image': function () {
+                                    QuillWatch.emit(this.quill.id)
+                                }
+                            }
+                        }
+                    }
+                },
             }
         },
         created() {
             this.getData();
         },
         methods: {
+            onEditorChange({ editor, html, text }) {
+                this.form.details = html;
+            },
             //设置上传图片接口地址
             uploadUrl(){
                 var url=this.$api.uploadUrl + "/Images/upload";
@@ -188,7 +232,9 @@
                     tel: this.form.tel,
                     lat: this.form.lat,
                     lng: this.form.lng,
-                    city: this.form.city
+                    city: this.form.city,
+                    integral: this.form.integral,
+                    yestardetails: this.form.yestardetails
                 });
                 this.$api.post('ShopConfig/saveConfig', params, res => {
                     this.$message.success(res.msg);
@@ -197,7 +243,20 @@
                     this.tableData = [];
                     this.$message.error(err.msg);
                 });
-            }
+            },
+            //将转移符号替换为html
+            escapeStringHTML(str) {
+                if(str){
+                    str = str.replace(/&lt;/g,'<');
+                    str = str.replace(/&gt;/g,'>');
+                    str = str.replace(/&quot;/g,'"');
+                }
+                return str;
+            },
+            submit(){
+                let str=this.escapeStringHTML(this.form.details);
+                console.log(str);
+            },
         }
     }
 </script>

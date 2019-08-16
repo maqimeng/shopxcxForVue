@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 订单管理</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 积分订单</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
@@ -13,24 +13,13 @@
                     <!--<el-option key="2" label="湖南省" value="湖南省"></el-option>-->
                 <!--</el-select>-->
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
-                <el-select v-model="selectedStatus" class="mr10" @change="change">
-                    <el-option
-                            v-for="item in statusList"
-                            :key="item.id"
-                            :label="item.title"
-                            :value="item.id">{{item.title}}
-                    </el-option>
-                    <!--<el-option key="bbk" label="步步高" value="bbk"></el-option>-->
-                    <!--<el-option key="xtc" label="小天才" value="xtc"></el-option>-->
-                    <!--<el-option key="imoo" label="imoo" value="imoo"></el-option>-->
-                </el-select>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
                 <!--<el-button type="primary" style="float: right" @click="handleEdit(undefined, undefined, 1)">添加</el-button>-->
             </div>
             <el-table :data="data" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>
-                <el-table-column prop="ordernumber" align="center" label="订单号" width="200">
+                <el-table-column prop="ordernumber" align="center" label="订单号">
                 </el-table-column>
                 <el-table-column prop="nickname" align="center" label="用户昵称">
                 </el-table-column>
@@ -38,29 +27,13 @@
                 </el-table-column>
                 <el-table-column prop="remarks" align="center" label="备注">
                 </el-table-column>
-
-                <el-table-column prop="sumprice" align="center" label="总金额">
+                <el-table-column prop="goods[0].title" align="center" label="积分商品名称">
                 </el-table-column>
-                <el-table-column prop="reduceprice" align="center" label="优惠券减免金额">
-                    <template slot-scope="scope">
-                        <div style="color:#FF0000">-{{scope.row.reduceprice}}</div>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="payprice" align="center" label="实付金额">
+                <el-table-column prop="sumintegral" align="center" label="积分金额">
                 </el-table-column>
 
 
-                <el-table-column prop="status" align="center" label="订单状态">
-                    <template slot-scope="scope">
-                        <div v-if="scope.row.status==1" style="color:#EDA200">未支付</div>
-                        <div v-else-if="scope.row.status==2" style="color:#008000">已支付</div>
-                        <div v-else-if="scope.row.status==3" style="color:#409EFF">已取消</div>
-                        <div v-else-if="scope.row.status==4" style="color:#FF0000">退款中</div>
-                        <div v-else-if="scope.row.status==5" style="color:#FF0000">已退款</div>
-                    </template>
-                </el-table-column>
-
-                <el-table-column prop="datetime" label="更新时间" align="center" width="170" sortable>
+                <el-table-column prop="datetime" label="更新时间" align="center" sortable>
                 </el-table-column>
                 <el-table-column label="操作" align="center">
                     <template slot-scope="scope">
@@ -136,24 +109,8 @@
                     <el-input type="textarea" style="width:600px;" :rows="4" :disabled="true" v-model="form.remarks"></el-input>
                 </el-form-item>
 
-                <el-form-item label="总金额">
-                    <el-input v-model="form.sumprice" style="width:400px" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="优惠券减免金额">
-                    <el-input v-model="form.reduceprice" style="width:400px" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="实付金额">
-                    <el-input v-model="form.payprice" style="width:400px" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="订单状态">
-                    <!--<el-input v-model="form.status" style="width:100px" :disabled="true"></el-input>-->
-                    <!--<template slot-scope="scope">-->
-                        <div v-if="form.status==1" style="color:#EDA200">未支付</div>
-                        <div v-else-if="form.status==2" style="color:#008000">已支付</div>
-                        <div v-else-if="form.status==3" style="color:#409EFF">已取消</div>
-                        <div v-else-if="form.status==4" style="color:#FF0000">退款中<el-button type="primary" @click="refund" style="margin-left: 10px;">发起退款</el-button></div>
-                        <div v-else-if="form.status==5" style="color:#FF0000">已退款</div>
-                    <!--</template>-->
+                <el-form-item label="积分金额">
+                    <el-input v-model="form.sumintegral" style="width:400px" :disabled="true"></el-input>
                 </el-form-item>
 
 
@@ -161,8 +118,8 @@
                     <el-input v-model="form.datetime" style="width:400px" :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="商品明细">
-                    <el-table :data="form.shopList" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
-                        <el-table-column prop="name" align="center" label="商品名称"></el-table-column>
+                    <el-table :data="form.goods" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+                        <el-table-column prop="title" align="center" label="商品名称"></el-table-column>
                         <el-table-column prop="thumbnail"  align="center" label="商品图片">
                             <template   slot-scope="scope">
                                 <el-popover
@@ -176,11 +133,7 @@
                                 <!--<img :src="scope.row.b_image"  min-width="70" height="70" />-->
                             </template>
                         </el-table-column>
-                        <el-table-column prop="specs.title" align="center" label="规格名称">
-                        </el-table-column>
-                        <el-table-column prop="specs.price" align="center" label="规格单价">
-                        </el-table-column>
-                        <el-table-column prop="number" align="center" label="数量">
+                        <el-table-column prop="sumintegral" align="center" label="积分金额">
                         </el-table-column>
 
                         <!--<el-table-column prop="sumprice" align="center" label="订单金额">-->
@@ -189,36 +142,6 @@
 
 
                     </el-table>
-                </el-form-item>
-                <el-form-item label="评论">
-                    <div v-if="form.comment!=false">
-                        <div>
-                            <span style="width: 60px; margin-right: 10px;">评分：</span>
-                            <el-rate style="display: inline-block;" :value="form.comment.xing">
-                            </el-rate>
-                        </div>
-
-                        <div>
-                            <span style="width: 60px; margin-right: 10px;">内容：</span>
-                            <div style="display: inline-block">{{form.comment.content}}</div>
-                        </div>
-                        <div style="display: flex; flex-direction: row; justify-content: flex-start">
-                            <span style="width: 60px;">图片：</span>
-                            <div>
-                                <el-popover
-                                        v-for="item in form.comment.imglist"
-                                        placement="left"
-                                        title=""
-                                        width="500"
-                                        trigger="hover">
-                                    <img :src="item" style="max-width: 100%; margin: 10px" />
-                                    <img slot="reference" :src="item" :alt="item" style="max-width: 130px; height: auto; max-height: 100px; margin: 10px">
-                                </el-popover>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else>此订单用户还没有评论哟!</div>
-
                 </el-form-item>
                 <!--<el-form-item label="点赞量" prop="fabulousnumber">-->
                     <!--<el-input v-model="form.fabulousnumber" style="width:150px" placeholder="请输入点赞量"></el-input>-->
@@ -288,26 +211,13 @@
                     nickname: '',
                     tel: '',
                     remarks: '',
-                    sumprice: '',
-                    status: '',
-                    shopList: [],
-                    comment: '',
-                    payprice: '',
-                    reduceprice: '',
+                    sumintegral: '',
+                    goods: [],
                     datetime: '',
                 },
                 idx: -1,
                 dialogVisible: false,
                 AddOrSave:'',  //1表示添加，2表示更新
-                statusList:[
-                    { id: 0, title: "全部"},
-                    { id: 1, title: "未支付"},
-                    { id: 2, title: "已支付"},
-                    { id: 3, title: "已取消"},
-                    { id: 4, title: "退款中"},
-                    { id: 5, title: "已退款"},
-                ],
-                selectedStatus:0,
                 rules: {
 
                 },
@@ -456,10 +366,9 @@
                     select_word: this.select_word,
                     pageIndex: this.cur_page,
                     number: this.number,
-                    status: this.selectedStatus
                 });
                 // console.log(params);
-                this.$api.post('ShopOrder/getOrderList', params, res => {
+                this.$api.post('ShopIntegralOrder/getOrderList', params, res => {
                     this.tableData = res.data.list;
                     this.sumPage = res.data.sumPage*10;
                     this.cur_page = res.data.currentPage;
@@ -496,12 +405,8 @@
                         nickname: null,
                         tel: null,
                         remarks: null,
-                        sumprice: null,
-                        status: null,
-                        shopList: [],
-                        comment: null,
-                        payprice: null,
-                        reduceprice: null,
+                        sumintegral: null,
+                        goods: [],
                         datetime: null,
                     };
                 }
@@ -514,12 +419,8 @@
                         nickname: item.nickname,
                         tel: item.tel,
                         remarks: item.remarks,
-                        sumprice: item.sumprice,
-                        status: item.status,
-                        shopList: item.shopList,
-                        comment: item.comment,
-                        payprice: item.payprice,
-                        reduceprice: item.reduceprice,
+                        sumintegral: item.sumintegral,
+                        goods: item.goods,
                         datetime: item.datetime,
                     };
                 }

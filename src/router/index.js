@@ -215,6 +215,31 @@ export default new Router({
                     component: resolve => { require(['../components/page/ShopOrderTable.vue'], resolve)},
                     meta: { title: '订单管理' }
                 },
+                {
+                    path: '/ShopIntegralGoodsTable',
+                    component: resolve => { require(['../components/page/ShopIntegralGoodsTable.vue'], resolve)},
+                    meta: { title: '积分商品' }
+                },
+                {
+                    path: '/ShopIntegralOrderTable',
+                    component: resolve => { require(['../components/page/ShopIntegralOrderTable.vue'], resolve)},
+                    meta: { title: '积分订单' }
+                },
+                {
+                    path: '/ShopOnlineTable',
+                    component: resolve => { require(['../components/page/ShopOnlineTable.vue'], resolve)},
+                    meta: { title: '预约管理' }
+                },
+                {
+                    path: '/ShopCoupon',
+                    component: resolve => { require(['../components/page/ShopCoupon.vue'], resolve)},
+                    meta: { title: '优惠券管理' }
+                },
+                {
+                    path: '/ShopDoctorTable',
+                    component: resolve => { require(['../components/page/ShopDoctorTable.vue'], resolve)},
+                    meta: { title: '医生管理' }
+                },
             ]
         },
         {

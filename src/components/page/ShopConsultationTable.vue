@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 轮播图管理</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 咨询管理</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
@@ -14,32 +14,35 @@
                 <!--</el-select>-->
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
-                <el-button type="primary" style="float: right" @click="handleEdit(undefined, undefined, 1)">添加</el-button>
+                <el-button type="primary" style="float: right" @click="handleEdit2(undefined, undefined, 1)">添加咨询</el-button>
             </div>
             <el-table :data="data" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>\
-                <el-table-column prop="title" align="center" label="标题">
+                <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>
+                <el-table-column prop="name" align="left" width="150" label="姓名">
                 </el-table-column>
-                <el-table-column prop="b_image" align="center" label="图片">
+                <el-table-column prop="imgurl" align="center" label="二维码">
                     <template   slot-scope="scope">
                         <el-popover
                                 placement="left"
                                 title=""
                                 width="500"
                                 trigger="hover">
-                            <img :src="scope.row.b_image" style="max-width: 100%" />
-                            <img slot="reference" :src="scope.row.b_image" :alt="scope.row.b_image" style="max-width: 130px; height: auto; max-height: 100px">
+                            <img :src="scope.row.imgurl" style="max-width: 100%" />
+                            <img slot="reference" :src="scope.row.imgurl" :alt="scope.row.imgurl" style="max-width: 130px; height: auto; max-height: 100px">
                         </el-popover>
                         <!--<img :src="scope.row.b_image"  min-width="70" height="70" />-->
                     </template>
                 </el-table-column>
-                <el-table-column prop="sort" label="排序" width="100" align="center"></el-table-column>
-                <el-table-column prop="datetime" label="更新时间" align="center" sortable width="200">
+                <el-table-column prop="userList.length" align="center" width="150" label="裂变用户数量">
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column prop="datetime"  align="center" label="更新时间" sortable width="160">
+                </el-table-column>
+                <el-table-column label="操作" width="200" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row, 2)">编辑</el-button>
+                        <el-button type="text" icon="el-icon-edit"><a :href="scope.row.imgurl" download="qecode.png" target="_blank">下载二维码</a></el-button>
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit2(scope.$index, scope.row, 2)">修改</el-button>
+                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row, 2)">查看裂变用户</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
@@ -51,45 +54,50 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="80%">
-            <el-form ref="form" :model="form" label-width="100px">
-                <el-form-item label="标题">
-                    <el-input v-model="form.title" style="width:350px"></el-input>
+        <el-dialog title="裂变用户" v-loading="loading" :visible.sync="editVisible" width="90%">
+            <el-table :data="subForm" border class="table" style="width: 100%">
+                <el-table-column prop="userid" label="ID" align="center"></el-table-column>
+                <el-table-column prop="nickname" label="微信昵称" align="center" ></el-table-column>
+                <el-table-column prop="gender" label="性别" align="center" >
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.gender==1">男</div>
+                        <div v-else>女</div>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="tel" label="手机号码" align="center" ></el-table-column>
+                <el-table-column prop="province" label="省份" align="center" ></el-table-column>
+                <el-table-column prop="city" label="城市" align="center" ></el-table-column>
+                <el-table-column prop="avatarurl"  align="center" label="头像">
+                    <template   slot-scope="scope">
+                        <el-popover
+                                placement="left"
+                                title=""
+                                width="500"
+                                trigger="hover">
+                            <img :src="scope.row.avatarurl" style="max-width: 100%" />
+                            <img slot="reference" :src="scope.row.avatarurl" :alt="scope.row.avatarurl" style="max-width: 130px; height: auto; max-height: 100px">
+                        </el-popover>
+                        <!--<img :src="scope.row.b_image"  min-width="70" height="70" />-->
+                    </template>
+                </el-table-column>
+
+                <el-table-column prop="datetime" align="center"  label="更新时间"></el-table-column>
+            </el-table>
+            <!--<span slot="footer" class="dialog-footer">-->
+                <!--<el-button @click="hideEditVisible">取 消</el-button>-->
+                <!--<el-button type="primary" @click="saveEdit('form')">确 定</el-button>-->
+            <!--</span>-->
+        </el-dialog>
+        <!-- 添加或修改咨询信息 -->
+        <el-dialog title="咨询信息" v-loading="loading" :visible.sync="editVisible2" width="50%">
+            <el-form ref="form" :rules="rules" :model="form" label-width="145px">
+                <el-form-item label="咨询姓名" prop="name">
+                    <el-input v-model="form.name" style="width:50%" placeholder="请输入咨询姓名"></el-input>
                 </el-form-item>
-                <el-form-item label="图片">
-                    <el-upload
-                            class="avatar-uploader"
-                            name="image"
-                            with-credentials
-                            :data="{id:this.form.imgid}"
-                            :action="uploadUrl()"
-                            :on-error="uploadError"
-                            :on-success="handleAvatarSuccess"
-                            :before-upload="beforeAvatarUpload"
-                            :on-progress="uploading"
-                            :show-file-list="false"
-                            :auto-upload="true"
-                            enctype="multipart/form-data">
-                        <img v-if="form.b_image" :src="form.b_image" class="avatar">
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                    <span style="color:red">建议尺寸1125*650</span>
-                </el-form-item>
-                <el-form-item label="排序">
-                    <el-input v-model="form.sort" style="width:100px"></el-input>
-                    <span style="color:red">&nbsp;&nbsp;注：数值越大展示越靠前，不输入则默认排序</span>
-                </el-form-item>
-                <el-form-item label="轮播图详情">
-                    <quill-editor ref="myTextEditor" v-model="form.details" :options="editorOption"></quill-editor>
-                    <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
-                </el-form-item>
-                <!--<el-form-item label="日期">-->
-                    <!--<el-date-picker type="date" placeholder="选择日期" v-model="form.b_datetime" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>-->
-                <!--</el-form-item>-->
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button @click="editVisible2 = false">取 消</el-button>
+                <el-button type="primary" @click="saveEdit('form')">确 定</el-button>
             </span>
         </el-dialog>
 
@@ -105,17 +113,8 @@
 </template>
 
 <script>
-    import 'quill/dist/quill.core.css';
-    import 'quill/dist/quill.snow.css';
-    import 'quill/dist/quill.bubble.css';
-    import {quillEditor, Quill} from 'vue-quill-editor'
-    import {container, ImageExtend, QuillWatch} from 'quill-image-extend-module';
-    Quill.register('modules/ImageExtend', ImageExtend)
     export default {
         name: 'basetable',
-        components: {
-            quillEditor
-        },
         data() {
             return {
                 url: './vuetable.json',
@@ -130,42 +129,30 @@
                 is_search: false,
                 editVisible: false,
                 delVisible: false,
+                editVisible2: false,  //添加或修改咨询弹框
                 form: {
-                    id: '',
-                    title: '',
-                    imgid: '',
-                    b_image: '',
-                    details: '',
-                    sort: '',
-                    datetime: '',
+                    id:'',
+                    name: '',
+                    imgid:'',
+                    imgurl:'',
+                    userList: [],
+                    datetime:''
                 },
                 idx: -1,
                 dialogVisible: false,
                 AddOrSave:'',  //1表示添加，2表示更新
-                // 富文本框参数设置
-                editorOption: {
-                    modules: {
-                        ImageExtend: {
-                            loading: true,
-                            name: 'image',
-                            action: this.$api.uploadUrl+"/Images/uploadEditorImage",
-                            response: (res) => {
-                                return res.data
-                            }
-                        },
-                        toolbar: {
-                            container: container,
-                            handlers: {
-                                'image': function () {
-                                    QuillWatch.emit(this.quill.id)
-                                }
-                            }
-                        }
-                    }
+                AddOrSave2:'',  //1表示添加，2表示更新
+                subForm:[],  //裂变用户列表
+                loading:false,
+                rules: {
+                    name: [
+                        { required: true, message: '请输入咨询姓名', trigger: 'blur' }
+                    ],
                 },
             }
         },
         created() {
+            //获取初始数据
             this.getData();
         },
         computed: {
@@ -173,7 +160,7 @@
                 return this.tableData.filter((d) => {
                     let is_del = false;
                     for (let i = 0; i < this.del_list.length; i++) {
-                        if (d.title === this.del_list[i].title) {
+                        if (d.name === this.del_list[i].name) {
                             is_del = true;
                             break;
                         }
@@ -199,6 +186,7 @@
             //图片上传之前
             beforeAvatarUpload(file){
                 // console.log(file);
+                this.loading=true;
             },
             //正在上传中
             uploading(event, file, fileList){
@@ -212,8 +200,9 @@
             },
             //图片上传成功
             handleAvatarSuccess(res, file){
-                console.log(res);
-                this.form.imgid=res.data;
+                this.loading=false;
+                // console.log(res);
+                this.form.picid=res.data;
                 this.form.b_image = URL.createObjectURL(file.raw);
                 this.getData();
                 this.$message.success(res.msg);
@@ -236,11 +225,11 @@
                     number: this.number
                 });
                 // console.log(params);
-                this.$api.post('ShopBanner/getBannerList', params, res => {
+                this.$api.post('ShopConsultation/getConsultationList', params, res => {
                     this.tableData = res.data.list;
                     this.sumPage = res.data.sumPage*10;
                     this.cur_page = res.data.currentPage;
-                    console.log(res);
+                    console.log(this.tableData);
                 }, err => {
                     this.tableData = [];
                     this.$message.error(err.msg);
@@ -257,7 +246,7 @@
                 this.getData();
             },
             formatter(row, column) {
-                return row.url;
+                return row.username;
             },
             filterTag(value, row) {
                 return row.tag === value;
@@ -266,31 +255,40 @@
                 this.AddOrSave=status;
                 //如果是添加则把form清空
                 if(status==1){
+                    this.subForm=[];
+                }
+                if(index!=undefined && row!=undefined){
+                    this.idx = index;
+                    const item = this.tableData[index];
+                    this.subForm=item.userList;
+                }
+                this.editVisible = true;
+            },
+            //添加或修改咨询信息
+            handleEdit2(index, row, status) {
+                this.AddOrSave2=status;
+                //如果是添加则把form清空
+                if(status==1){
                     this.form = {
-                        id: null,
-                        title: null,
-                        imgid: null,
-                        b_image: null,
-                        details: null,
-                        sort: null,
-                        datetime: null,
+                        id:null,
+                        name: null,
+                        imgid:null,
+                        imgurl:null,
+                        datetime:null
                     };
                 }
                 if(index!=undefined && row!=undefined){
                     this.idx = index;
                     const item = this.tableData[index];
                     this.form = {
-                        id: item.id,
-                        title: item.title,
-                        imgid: item.imgid,
-                        b_image: item.b_image,
-                        details: item.details,
-                        sort: item.sort,
-                        datetime: item.datetime,
+                        id:item.id,
+                        name: item.name,
+                        imgid:item.imgid,
+                        imgurl:item.imgurl,
+                        datetime:item.datetime
                     };
                 }
-                this.editVisible = true;
-                console.log(this.form);
+                this.editVisible2 = true;
             },
             handleDelete(index, row) {
                 this.idx = index;
@@ -312,43 +310,48 @@
                 this.multipleSelection = val;
             },
             // 保存编辑
-            saveEdit() {
+            saveEdit(formName) {
                 // this.$set(this.tableData, this.idx, this.form);
-                this.editVisible = false;
-                var params=null;
-                //1表示添加，2表示更新
-                if(this.AddOrSave==1){
-                    params=this.$qs.stringify({
-                        imgid: this.form.imgid,
-                        title: this.form.title,
-                        details: this.escapeStringHTML(this.form.details),
-                        sort: this.form.sort
-                    });
-                }else{
-                    params=this.$qs.stringify({
-                        id: this.form.id,
-                        title: this.form.title,
-                        details: this.escapeStringHTML(this.form.details),
-                        sort: this.form.sort
-                    });
-                }
-                this.$api.post('ShopBanner/saveBanner', params, res => {
-                    this.getData();
-                    this.$message.success(res.msg);
-                }, err => {
-                    this.$message.error(err.msg);
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.editVisible2 = false;
+                        var params=null;
+                        //1表示添加，2表示更新
+                        if(this.AddOrSave==1){
+                            params=this.$qs.stringify({
+                                name: this.form.name,
+                            });
+                        }else{
+                            params=this.$qs.stringify({
+                                id: this.form.id,
+                                name: this.form.name,
+                            });
+                        }
+                        this.loading=true;
+                        this.$api.post('ShopConsultation/saveConsultation', params, res => {
+                            this.getData();
+                            this.$message.success(res.msg);
+                            console.log(res);
+                            this.loading=false;
+                        }, err => {
+                            this.$message.error(err.msg);
+                            this.loading=false;
+                        });
+                    }else{
+                        console.log("请填写所需数据");
+                        return false;
+                    }
                 });
-
-
-                // this.$message.success(`修改第 ${this.idx+1} 行成功`);
             },
             // 确定删除
             deleteRow(){
+                // console.log(this.form);
+                // return;
                 var params=this.$qs.stringify({
                     id: this.form.id
                 });
                 console.log(this.form);
-                this.$api.post('ShopBanner/deleteBanner', params, res => {
+                this.$api.post('ShopConsultation/deleteConsultation', params, res => {
                     this.getData();
                     this.$message.success(res.msg+res.data+"条数据");
                 }, err => {
@@ -356,19 +359,9 @@
                 });
                 this.delVisible = false;
             },
-            //将转移符号替换为html
-            escapeStringHTML(str) {
-                if(str){
-                    str = str.replace(/&lt;/g,'<');
-                    str = str.replace(/&gt;/g,'>');
-                    str = str.replace(/&quot;/g,'"');
-                }
-                return str;
-            },
-            submit(){
-                let str=this.escapeStringHTML(this.form.details);
-                console.log(str);
-            },
+            hideEditVisible(){
+                this.editVisible=false;
+            }
         }
     }
 

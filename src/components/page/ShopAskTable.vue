@@ -2,7 +2,7 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 轮播图管理</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 问答管理</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
@@ -18,26 +18,19 @@
             </div>
             <el-table :data="data" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>\
-                <el-table-column prop="title" align="center" label="标题">
+                <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>
+                <el-table-column prop="ask" align="left" label="问题" :show-overflow-tooltip='true'>
                 </el-table-column>
-                <el-table-column prop="b_image" align="center" label="图片">
-                    <template   slot-scope="scope">
-                        <el-popover
-                                placement="left"
-                                title=""
-                                width="500"
-                                trigger="hover">
-                            <img :src="scope.row.b_image" style="max-width: 100%" />
-                            <img slot="reference" :src="scope.row.b_image" :alt="scope.row.b_image" style="max-width: 130px; height: auto; max-height: 100px">
-                        </el-popover>
-                        <!--<img :src="scope.row.b_image"  min-width="70" height="70" />-->
-                    </template>
+                <el-table-column prop="answer" align="left" label="回答" :show-overflow-tooltip='true'>
                 </el-table-column>
-                <el-table-column prop="sort" label="排序" width="100" align="center"></el-table-column>
-                <el-table-column prop="datetime" label="更新时间" align="center" sortable width="200">
+                <el-table-column prop="casemenu" align="center" width="150" label="分类">
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column prop="looknum" align="center" width="100" label="浏览量">
+                </el-table-column>
+                <el-table-column prop="sort" label="排序" width="130" align="center"></el-table-column>
+                <el-table-column prop="datetime" label="更新时间" width="180" align="center" sortable>
+                </el-table-column>
+                <el-table-column label="操作" align="center" width="150">
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row, 2)">编辑</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -51,45 +44,35 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="80%">
-            <el-form ref="form" :model="form" label-width="100px">
-                <el-form-item label="标题">
-                    <el-input v-model="form.title" style="width:350px"></el-input>
+        <el-dialog title="编辑" v-loading="loading" :visible.sync="editVisible" width="70%">
+            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                <el-form-item label="问题" prop="ask">
+                    <el-input type="textarea" style="width:600px;" :rows="6" v-model="form.ask"></el-input>
                 </el-form-item>
-                <el-form-item label="图片">
-                    <el-upload
-                            class="avatar-uploader"
-                            name="image"
-                            with-credentials
-                            :data="{id:this.form.imgid}"
-                            :action="uploadUrl()"
-                            :on-error="uploadError"
-                            :on-success="handleAvatarSuccess"
-                            :before-upload="beforeAvatarUpload"
-                            :on-progress="uploading"
-                            :show-file-list="false"
-                            :auto-upload="true"
-                            enctype="multipart/form-data">
-                        <img v-if="form.b_image" :src="form.b_image" class="avatar">
-                        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                    </el-upload>
-                    <span style="color:red">建议尺寸1125*650</span>
+                <el-form-item label="回答" prop="answer">
+                    <el-input type="textarea" style="width:600px;" :rows="6" v-model="form.answer"></el-input>
+                </el-form-item>
+                <el-form-item label="日记类别" prop="casemenuid">
+                    <el-select v-model="form.casemenuid">
+                        <el-option
+                                v-for="item in caseList"
+                                :key="item.id"
+                                :label="item.title"
+                                :value="item.id">{{item.title}}
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="浏览量" prop="looknum">
+                    <el-input v-model="form.looknum" style="width:150px" placeholder="请输入浏览量"></el-input>
                 </el-form-item>
                 <el-form-item label="排序">
-                    <el-input v-model="form.sort" style="width:100px"></el-input>
+                    <el-input v-model="form.sort" style="width:150px"></el-input>
                     <span style="color:red">&nbsp;&nbsp;注：数值越大展示越靠前，不输入则默认排序</span>
                 </el-form-item>
-                <el-form-item label="轮播图详情">
-                    <quill-editor ref="myTextEditor" v-model="form.details" :options="editorOption"></quill-editor>
-                    <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
-                </el-form-item>
-                <!--<el-form-item label="日期">-->
-                    <!--<el-date-picker type="date" placeholder="选择日期" v-model="form.b_datetime" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>-->
-                <!--</el-form-item>-->
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
+                <el-button type="primary" @click="saveEdit('form')">确 定</el-button>
             </span>
         </el-dialog>
 
@@ -132,16 +115,33 @@
                 delVisible: false,
                 form: {
                     id: '',
-                    title: '',
-                    imgid: '',
-                    b_image: '',
-                    details: '',
+                    casemenuid: '',
+                    casemenu: '',
+                    ask: '',
+                    answer: '',
+                    looknum: '',
                     sort: '',
                     datetime: '',
                 },
                 idx: -1,
                 dialogVisible: false,
                 AddOrSave:'',  //1表示添加，2表示更新
+                rules: {
+                    ask: [
+                        { required: true, message: '请输入问题', trigger: 'blur' }
+                    ],
+                    answer: [
+                        { required: true, message: '请输入回答', trigger: 'blur' }
+                    ],
+                    casemenuid:[
+                        { required: true, message: '请选择日记类别', trigger: 'change' }
+                    ],
+                    looknum: [
+                        { required: true, message: '请输入浏览量', trigger: 'blur' }
+                    ],
+                },
+                dialogImageUrl: '',
+                isShowBigImg: false,
                 // 富文本框参数设置
                 editorOption: {
                     modules: {
@@ -163,6 +163,13 @@
                         }
                     }
                 },
+                //规格
+                inputVisible: false,
+                inputValue: '',
+                loading:false, //加载中
+                goodsList:[],  //菜单列表
+                type: [],  //被选中的菜单列表
+                caseList:[],  //日记分类列表
             }
         },
         created() {
@@ -191,6 +198,48 @@
             }
         },
         methods: {
+            onEditorChange({ editor, html, text }) {
+                this.form.details = html;
+            },
+            //删除图片
+            handleRemove(file, fileList) {
+                // console.log(file.response.data);
+                // console.log(file.id);
+                let imgid=null;
+                if(file.id!=undefined){
+                    imgid=file.id
+                }else{
+                    imgid=file.response.data;
+                }
+                var params=this.$qs.stringify({
+                    imgId: imgid,
+                    id: this.form.id
+                });
+                console.log(params);
+                // return;
+                this.$api.post('ShopIntegralGoods/delImage', params, res => {
+                    var imgArr=this.form.swiperimgTemp;
+                    imgArr.forEach(function(item, index, arr) {
+                        if(item == imgid) {
+                            arr.splice(index, 1);
+                        }
+                    });
+                    this.$message.success(res.msg);
+                }, err => {
+                    var imgArr=this.form.swiperimgTemp;
+                    imgArr.forEach(function(item, index, arr) {
+                        if(item == imgid) {
+                            arr.splice(index, 1);
+                        }
+                    });
+                    this.$message.error(err.msg);
+                });
+            },
+            //查看大图
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.isShowBigImg = true;
+            },
             //设置上传图片接口地址
             uploadUrl(){
                 var url=this.$api.uploadUrl + "/Images/upload";
@@ -198,7 +247,9 @@
             },
             //图片上传之前
             beforeAvatarUpload(file){
-                // console.log(file);
+                console.log(this.form.pic);
+                console.log(file);
+                this.loading=true;
             },
             //正在上传中
             uploading(event, file, fileList){
@@ -210,12 +261,20 @@
             uploadError(err){
                 this.$message.error(err.msg);
             },
-            //图片上传成功
+            //医生头像图片上传成功
             handleAvatarSuccess(res, file){
+                this.loading=false;
                 console.log(res);
-                this.form.imgid=res.data;
-                this.form.b_image = URL.createObjectURL(file.raw);
-                this.getData();
+                this.form.doctor_face=res.data;
+                this.form.face = URL.createObjectURL(file.raw);
+                this.$message.success(res.msg);
+            },
+            //医生卡片图片上传成功
+            handleAvatarSuccess2(res, file){
+                this.loading=false;
+                console.log(res);
+                this.form.doctor_card=res.data;
+                this.form.card = URL.createObjectURL(file.raw);
                 this.$message.success(res.msg);
             },
             // 分页导航
@@ -236,7 +295,7 @@
                     number: this.number
                 });
                 // console.log(params);
-                this.$api.post('ShopBanner/getBannerList', params, res => {
+                this.$api.post('ShopAsk/getDoctorList', params, res => {
                     this.tableData = res.data.list;
                     this.sumPage = res.data.sumPage*10;
                     this.cur_page = res.data.currentPage;
@@ -263,15 +322,18 @@
                 return row.tag === value;
             },
             handleEdit(index, row, status) {
+                //获取日记分类列表
+                this.getCaseMenuList();
                 this.AddOrSave=status;
                 //如果是添加则把form清空
                 if(status==1){
                     this.form = {
                         id: null,
-                        title: null,
-                        imgid: null,
-                        b_image: null,
-                        details: null,
+                        casemenuid: null,
+                        casemenu: null,
+                        ask: null,
+                        answer: null,
+                        looknum: null,
                         sort: null,
                         datetime: null,
                     };
@@ -281,16 +343,16 @@
                     const item = this.tableData[index];
                     this.form = {
                         id: item.id,
-                        title: item.title,
-                        imgid: item.imgid,
-                        b_image: item.b_image,
-                        details: item.details,
+                        casemenuid: item.casemenuid,
+                        casemenu: item.casemenu,
+                        ask: item.ask,
+                        answer: item.answer,
+                        looknum: item.looknum,
                         sort: item.sort,
                         datetime: item.datetime,
                     };
                 }
                 this.editVisible = true;
-                console.log(this.form);
             },
             handleDelete(index, row) {
                 this.idx = index;
@@ -312,34 +374,59 @@
                 this.multipleSelection = val;
             },
             // 保存编辑
-            saveEdit() {
+            saveEdit(formName) {
                 // this.$set(this.tableData, this.idx, this.form);
-                this.editVisible = false;
-                var params=null;
-                //1表示添加，2表示更新
-                if(this.AddOrSave==1){
-                    params=this.$qs.stringify({
-                        imgid: this.form.imgid,
-                        title: this.form.title,
-                        details: this.escapeStringHTML(this.form.details),
-                        sort: this.form.sort
-                    });
-                }else{
-                    params=this.$qs.stringify({
-                        id: this.form.id,
-                        title: this.form.title,
-                        details: this.escapeStringHTML(this.form.details),
-                        sort: this.form.sort
-                    });
-                }
-                this.$api.post('ShopBanner/saveBanner', params, res => {
-                    this.getData();
-                    this.$message.success(res.msg);
-                }, err => {
-                    this.$message.error(err.msg);
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.editVisible = false;
+                        var params=null;
+                        //1表示添加，2表示更新
+                        if(this.AddOrSave==1){
+                            params=this.$qs.stringify({
+                                ask: this.form.ask,
+                                casemenuid: this.form.casemenuid,
+                                answer: this.form.answer,
+                                looknum: this.form.looknum,
+                                sort: this.form.sort,
+                            });
+                        }else{
+                            params=this.$qs.stringify({
+                                id: this.form.id,
+                                casemenuid: this.form.casemenuid,
+                                ask: this.form.ask,
+                                answer: this.form.answer,
+                                looknum: this.form.looknum,
+                                sort: this.form.sort,
+                            });
+                        }
+                        // console.log({
+                        //     id: this.form.id,
+                        //     doctor_name: this.form.doctor_name,
+                        //     doctor_title: this.form.doctor_title,
+                        //     goodat: this.form.goodat,
+                        //     doctor_face: this.form.doctor_face,
+                        //     doctor_card: this.form.doctor_card,
+                        //     browse: this.form.browse,
+                        //     praise: this.form.praise,
+                        //     content: this.escapeStringHTML(this.form.content),
+                        //     cert: this.escapeStringHTML(this.form.cert),
+                        //     project: this.escapeStringHTML(this.form.project),
+                        //     sort: this.form.sort,
+                        // });
+                        // return;
+                        this.$api.post('ShopAsk/saveAsk', params, res => {
+                            this.getData();
+                            this.$message.success(res.msg);
+                            // console.log(res);
+
+                        }, err => {
+                            this.$message.error(err.msg);
+                        });
+                    }else{
+                        console.log("请填写所需数据");
+                        return false;
+                    }
                 });
-
-
                 // this.$message.success(`修改第 ${this.idx+1} 行成功`);
             },
             // 确定删除
@@ -347,8 +434,9 @@
                 var params=this.$qs.stringify({
                     id: this.form.id
                 });
-                console.log(this.form);
-                this.$api.post('ShopBanner/deleteBanner', params, res => {
+                // console.log(params);
+                // return;
+                this.$api.post('ShopAsk/deleteAsk', params, res => {
                     this.getData();
                     this.$message.success(res.msg+res.data+"条数据");
                 }, err => {
@@ -368,6 +456,15 @@
             submit(){
                 let str=this.escapeStringHTML(this.form.details);
                 console.log(str);
+            },
+            //获取日记分类
+            getCaseMenuList(){
+                this.$api.post('ShopCase/getCaseMenuList', null, res => {
+                    this.caseList=res.data;
+                    console.log(this.caseList);
+                }, err => {
+                    this.$message.error(err.msg);
+                });
             },
         }
     }
@@ -423,5 +520,23 @@
         width: 100%;
         /*height: 100%;*/
         display: block;
+    }
+    .el-tag + .el-tag {
+        margin-left: 10px;
+    }
+    .button-new-tag {
+        margin-left: 10px;
+        height: 30px;
+        line-height: 30px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .input-new-tag {
+        width: 110px;
+        margin-left: 10px;
+        vertical-align: bottom;
+    }
+    .ql-snow .ql-editor img{
+        vertical-align: top !important;
     }
 </style>

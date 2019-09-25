@@ -98,6 +98,13 @@
                 <el-form-item label="医生职称" prop="doctor_title">
                     <el-input v-model="form.doctor_title" style="width:400px" placeholder="请输入医生职称"></el-input>
                 </el-form-item>
+                <el-form-item label="从业时长" prop="year">
+                    <el-input v-model="form.year" style="width:100px;margin-right:10px" placeholder="请输入医生从业时长"></el-input>
+                    <span>年</span>
+                </el-form-item>
+                <el-form-item label="擅长" prop="goodat">
+                    <el-input v-model="form.goodat" style="width:400px" placeholder="请输入医生擅长项目"></el-input>
+                </el-form-item>
                 <el-form-item label="医生头像">
                     <el-upload
                             class="avatar-uploader"
@@ -136,19 +143,41 @@
                     </el-upload>
                     <span style="color:red">建议尺寸670*350</span>
                 </el-form-item>
+                <el-form-item label="评分">
+                    <el-rate v-model="form.score">
+                    </el-rate>
+                </el-form-item>
                 <el-form-item label="浏览量" prop="browse">
                     <el-input v-model="form.browse" style="width:150px" placeholder="请输入浏览量"></el-input>
                 </el-form-item>
                 <el-form-item label="点赞量" prop="praise">
                     <el-input v-model="form.praise" style="width:150px" placeholder="请输入点赞量"></el-input>
                 </el-form-item>
-
+                <el-form-item label="接单量" prop="ordernum">
+                    <el-input v-model="form.ordernum" style="width:150px" placeholder="请输入接单量"></el-input>
+                </el-form-item>
+                <el-form-item label="粉丝数量" prop="follow">
+                    <el-input v-model="form.follow" style="width:150px" placeholder="请输入粉丝数量"></el-input>
+                </el-form-item>
                 <el-form-item label="排序">
                     <el-input v-model="form.sort" style="width:150px"></el-input>
                     <span style="color:red">&nbsp;&nbsp;注：数值越大展示越靠前，不输入则默认排序</span>
                 </el-form-item>
-                <el-form-item label="医生详情">
+                <el-form-item label="关联日记">
+                    <el-checkbox-group v-model="type">
+                        <el-checkbox v-for="item in goodsList" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+                <el-form-item label="档案">
                     <quill-editor ref="myTextEditor" v-model="form.content" :options="editorOption"></quill-editor>
+                    <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
+                </el-form-item>
+                <el-form-item label="证书">
+                    <quill-editor ref="myTextEditor" v-model="form.cert" :options="editorOption"></quill-editor>
+                    <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
+                </el-form-item>
+                <el-form-item label="项目">
+                    <quill-editor ref="myTextEditor" v-model="form.project" :options="editorOption"></quill-editor>
                     <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
                 </el-form-item>
                 <!--<el-form-item label="日期">-->
@@ -202,13 +231,20 @@
                     id: '',
                     doctor_name: '',
                     doctor_title: '',
+                    goodat: '',
+                    year: '',
                     doctor_face: '',
                     face: '',
                     doctor_card: '',
                     card: '',
+                    score: 0,
                     browse: '',
                     praise: '',
+                    follow: '',
+                    ordernum: '',
                     content: '',
+                    cert: '',
+                    project: '',
                     sort: '',
                     datetime: '',
                 },
@@ -222,11 +258,23 @@
                     doctor_title: [
                         { required: true, message: '请输入医生职称', trigger: 'blur' }
                     ],
+                    year: [
+                        { required: true, message: '请输入医生从业时长', trigger: 'blur' }
+                    ],
+                    goodat: [
+                        { required: true, message: '请输入医生擅长项目', trigger: 'blur' }
+                    ],
                     browse: [
                         { required: true, message: '请输入浏览量', trigger: 'blur' }
                     ],
                     praise: [
                         { required: true, message: '请输入点赞量', trigger: 'blur' }
+                    ],
+                    follow: [
+                        { required: true, message: '请输入粉丝数量', trigger: 'blur' }
+                    ],
+                    ordernum: [
+                        { required: true, message: '请输入接单量', trigger: 'blur' }
                     ],
                 },
                 dialogImageUrl: '',
@@ -256,6 +304,8 @@
                 inputVisible: false,
                 inputValue: '',
                 loading:false, //加载中
+                goodsList:[],  //菜单列表
+                type: [],  //被选中的菜单列表
             }
         },
         created() {
@@ -408,7 +458,8 @@
                 return row.tag === value;
             },
             handleEdit(index, row, status) {
-
+                //获取日记列表
+                this.getCaseList();
                 this.AddOrSave=status;
                 //如果是添加则把form清空
                 if(status==1){
@@ -416,16 +467,24 @@
                         id: null,
                         doctor_name: null,
                         doctor_title: null,
+                        goodat: null,
+                        year: null,
                         doctor_face: null,
                         face: null,
                         doctor_card: null,
                         card: null,
+                        score: 0,
                         browse: null,
                         praise: null,
+                        follow: 0,
+                        ordernum: null,
                         content: null,
+                        cert: null,
+                        project: null,
                         sort: null,
                         datetime: null,
                     };
+                    this.type=[];
                 }
                 if(index!=undefined && row!=undefined){
                     this.idx = index;
@@ -434,16 +493,27 @@
                         id: item.id,
                         doctor_name: item.doctor_name,
                         doctor_title: item.doctor_title,
+                        goodat: item.goodat,
+                        year: item.year,
                         doctor_face: item.doctor_face,
                         face: item.face,
                         doctor_card: item.doctor_card,
                         card: item.card,
+                        score: item.score,
                         browse: item.browse,
                         praise: item.praise,
+                        follow: item.follow,
+                        ordernum: item.ordernum,
                         content: item.content,
+                        cert: item.cert,
+                        project: item.project,
                         sort: item.sort,
                         datetime: item.datetime,
                     };
+                    this.type=[];
+                    for(var i=0;i<row.caseList.length;i++){
+                        this.type.push(row.caseList[i]['id']);
+                    }
                 }
                 this.editVisible = true;
                 console.log(this.form);
@@ -479,38 +549,57 @@
                             params=this.$qs.stringify({
                                 doctor_name: this.form.doctor_name,
                                 doctor_title: this.form.doctor_title,
+                                goodat: this.form.goodat,
+                                year: this.form.year,
                                 doctor_face: this.form.doctor_face,
                                 doctor_card: this.form.doctor_card,
+                                score: this.form.score,
                                 browse: this.form.browse,
                                 praise: this.form.praise,
+                                follow: this.form.follow,
+                                ordernum: this.form.ordernum,
                                 content: this.escapeStringHTML(this.form.content),
+                                cert: this.escapeStringHTML(this.form.cert),
+                                project: this.escapeStringHTML(this.form.project),
                                 sort: this.form.sort,
+                                linkcase: this.type.join(','),
                             });
                         }else{
                             params=this.$qs.stringify({
                                 id: this.form.id,
                                 doctor_name: this.form.doctor_name,
                                 doctor_title: this.form.doctor_title,
+                                goodat: this.form.goodat,
+                                year: this.form.year,
                                 doctor_face: this.form.doctor_face,
                                 doctor_card: this.form.doctor_card,
+                                score: this.form.score,
                                 browse: this.form.browse,
                                 praise: this.form.praise,
+                                follow: this.form.follow,
+                                ordernum: this.form.ordernum,
                                 content: this.escapeStringHTML(this.form.content),
+                                cert: this.escapeStringHTML(this.form.cert),
+                                project: this.escapeStringHTML(this.form.project),
                                 sort: this.form.sort,
+                                linkcase: this.type.join(','),
                             });
                         }
                         // console.log({
                         //     id: this.form.id,
                         //     doctor_name: this.form.doctor_name,
                         //     doctor_title: this.form.doctor_title,
+                        //     goodat: this.form.goodat,
                         //     doctor_face: this.form.doctor_face,
                         //     doctor_card: this.form.doctor_card,
                         //     browse: this.form.browse,
                         //     praise: this.form.praise,
                         //     content: this.escapeStringHTML(this.form.content),
+                        //     cert: this.escapeStringHTML(this.form.cert),
+                        //     project: this.escapeStringHTML(this.form.project),
                         //     sort: this.form.sort,
                         // });
-
+                        // return;
                         this.$api.post('ShopDoctor/saveDoctor', params, res => {
                             this.getData();
                             this.$message.success(res.msg);
@@ -553,6 +642,15 @@
             submit(){
                 let str=this.escapeStringHTML(this.form.details);
                 console.log(str);
+            },
+            //获取日记列表
+            getCaseList(){
+                this.$api.post('ShopDoctor/getCaseList', null, res => {
+                    console.log(res);
+                    this.goodsList=res.data;
+                }, err => {
+                    this.$message.error(err.msg);
+                });
             },
         }
     }

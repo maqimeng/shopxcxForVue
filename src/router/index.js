@@ -240,6 +240,20 @@ export default new Router({
                     component: resolve => { require(['../components/page/ShopDoctorTable.vue'], resolve)},
                     meta: { title: '医生管理' }
                 },
+                {
+                    path: '/ShopAskTable',
+                    component: resolve => { require(['../components/page/ShopAskTable.vue'], resolve)},
+                    meta: { title: '问答管理' }
+                },{
+                    path: '/ShopUserLookRecordTable',
+                    component: resolve => { require(['../components/page/ShopUserLookRecordTable.vue'], resolve)},
+                    meta: { title: '用户浏览记录' }
+                },{
+                    path: '/ShopConsultationTable',
+                    component: resolve => { require(['../components/page/ShopConsultationTable.vue'], resolve)},
+                    meta: { title: '咨询管理' }
+                },
+
             ]
         },
         {

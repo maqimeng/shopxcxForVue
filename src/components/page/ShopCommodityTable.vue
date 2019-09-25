@@ -92,121 +92,157 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-loading="loading" :visible.sync="editVisible" width="70%">
-            <el-form ref="form" :rules="rules" :model="form" label-width="100px">
-                <el-form-item label="商品名称" prop="name">
-                    <el-input v-model="form.name" style="width:400px" placeholder="请输入商品名称"></el-input>
-                </el-form-item>
-                <el-form-item label="副标题" prop="title">
-                    <el-input v-model="form.title" style="width:400px" placeholder="请输入副标题"></el-input>
-                </el-form-item>
-                <el-form-item label="缩略图">
-                    <el-upload
-                            class="avatar-uploader"
-                            name="image"
-                            with-credentials
-                            list-type="picture-card"
-                            :data="{id:this.form.thumbnail}"
-                            :action="uploadUrl()"
-                            :on-error="uploadError"
-                            :on-success="handleAvatarSuccess"
-                            :before-upload="beforeAvatarUpload"
-                            :on-progress="uploading"
-                            :show-file-list="false"
-                            :auto-upload="true"
-                            enctype="multipart/form-data">
-                        <img v-if="form.b_image" :src="form.b_image" class="avatar">
-                        <i v-else class="el-icon-plus"></i>
-                    </el-upload>
-                    <span style="color:red">建议尺寸225*225</span>
-                </el-form-item>
-                <el-form-item label="轮播图">
-                    <!--<img v-for="item in form.swiperimgList" :src="item">-->
-                    <el-upload
-                            class="avatar-uploader"
-                            name="image"
-                            with-credentials
-                            list-type="picture-card"
-                            :data="{id:null}"
-                            :action="uploadUrl()"
-                            :on-error="uploadError"
-                            :on-success="handleAvatarSuccess2"
-                            :before-upload="beforeAvatarUpload"
-                            :on-progress="uploading"
-                            :auto-upload="true"
-                            :on-preview="handlePictureCardPreview"
-                            :on-remove="handleRemove"
-                            :file-list="this.form.swiperimgList"
-                            enctype="multipart/form-data">
+            <el-tabs v-model="activeName" :tab-position="tabPosition" @tab-click="handleClick">
+                <el-tab-pane label="商品编辑" name="first">
+                    <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                        <el-form-item label="商品名称" prop="name">
+                            <el-input v-model="form.name" style="width:400px" placeholder="请输入商品名称"></el-input>
+                        </el-form-item>
+                        <el-form-item label="副标题" prop="title">
+                            <el-input v-model="form.title" style="width:400px" placeholder="请输入副标题"></el-input>
+                        </el-form-item>
+                        <el-form-item label="缩略图">
+                            <el-upload
+                                    class="avatar-uploader"
+                                    name="image"
+                                    with-credentials
+                                    list-type="picture-card"
+                                    :data="{id:this.form.thumbnail}"
+                                    :action="uploadUrl()"
+                                    :on-error="uploadError"
+                                    :on-success="handleAvatarSuccess"
+                                    :before-upload="beforeAvatarUpload"
+                                    :on-progress="uploading"
+                                    :show-file-list="false"
+                                    :auto-upload="true"
+                                    enctype="multipart/form-data">
+                                <img v-if="form.b_image" :src="form.b_image" class="avatar">
+                                <i v-else class="el-icon-plus"></i>
+                            </el-upload>
+                            <span style="color:red">建议尺寸225*225</span>
+                        </el-form-item>
+                        <el-form-item label="轮播图">
+                            <!--<img v-for="item in form.swiperimgList" :src="item">-->
+                            <el-upload
+                                    class="avatar-uploader"
+                                    name="image"
+                                    with-credentials
+                                    list-type="picture-card"
+                                    :data="{id:null}"
+                                    :action="uploadUrl()"
+                                    :on-error="uploadError"
+                                    :on-success="handleAvatarSuccess2"
+                                    :before-upload="beforeAvatarUpload"
+                                    :on-progress="uploading"
+                                    :auto-upload="true"
+                                    :on-preview="handlePictureCardPreview"
+                                    :on-remove="handleRemove"
+                                    :file-list="this.form.swiperimgList"
+                                    enctype="multipart/form-data">
 
-                        <!--<i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
-                        <i class="el-icon-plus"></i>
-                    </el-upload>
-                    <el-dialog :visible.sync="isShowBigImg" :append-to-body="true" width="60%" top="10vh">
-                        <img width="100%" :src="dialogImageUrl" alt="">
-                    </el-dialog>
-                    <span style="color:red">建议尺寸1125*648</span>
-                </el-form-item>
-                <el-form-item label="原价" prop="beforeprice">
-                    <el-input v-model="form.beforeprice" style="width:150px" placeholder="请输入原价"></el-input>
-                </el-form-item>
-                <el-form-item label="销量" prop="salenumber">
-                    <el-input v-model="form.salenumber" style="width:150px" placeholder="请输入销量"></el-input>
-                </el-form-item>
-                <el-form-item label="商品类别" prop="categoryid">
-                    <el-select v-model="form.categoryid">
-                        <el-option
-                                v-for="item in categoryList"
-                                :key="item.id"
-                                :label="item.title"
-                                :value="item.id">{{item.title}}
-                        </el-option>
-                        <!--<el-option key="bbk" label="步步高" value="bbk"></el-option>-->
-                        <!--<el-option key="xtc" label="小天才" value="xtc"></el-option>-->
-                        <!--<el-option key="imoo" label="imoo" value="imoo"></el-option>-->
-                    </el-select>
-                </el-form-item>
+                                <!--<i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
+                                <i class="el-icon-plus"></i>
+                            </el-upload>
+                            <el-dialog :visible.sync="isShowBigImg" :append-to-body="true" width="60%" top="10vh">
+                                <img width="100%" :src="dialogImageUrl" alt="">
+                            </el-dialog>
+                            <span style="color:red">建议尺寸1125*648</span>
+                        </el-form-item>
+                        <el-form-item label="原价" prop="beforeprice">
+                            <el-input v-model="form.beforeprice" style="width:150px" placeholder="请输入原价"></el-input>
+                        </el-form-item>
+                        <el-form-item label="销量" prop="salenumber">
+                            <el-input v-model="form.salenumber" style="width:150px" placeholder="请输入销量"></el-input>
+                        </el-form-item>
+                        <el-form-item label="商品类别" prop="categoryid">
+                            <el-select v-model="form.categoryid">
+                                <el-option
+                                        v-for="item in categoryList"
+                                        :key="item.id"
+                                        :label="item.title"
+                                        :value="item.id">{{item.title}}
+                                </el-option>
+                                <!--<el-option key="bbk" label="步步高" value="bbk"></el-option>-->
+                                <!--<el-option key="xtc" label="小天才" value="xtc"></el-option>-->
+                                <!--<el-option key="imoo" label="imoo" value="imoo"></el-option>-->
+                            </el-select>
+                        </el-form-item>
 
-                <el-form-item label="上架">
-                    <el-switch v-model="form.isup"></el-switch>
-                </el-form-item>
-                <el-form-item label="热门爆品">
-                    <el-switch v-model="form.hot"></el-switch>
-                </el-form-item>
-                <el-form-item label="商品规格" prop="specs">
-                    <el-tag
-                            :key="tag.id"
-                            v-for="tag in form.specs"
-                            closable
-                            size="medium"
-                            :disable-transitions="false"
-                            @close="handleClose(tag)">
-                        {{tag.title}}({{tag.price}})
-                    </el-tag>
-                    <el-input
-                            class="input-new-tag"
-                            v-if="inputVisible"
-                            v-model="inputValue"
-                            ref="saveTagInput"
-                            size="medium"
-                            @keyup.enter.native="handleInputConfirm"
-                            @blur="handleInputConfirm"
-                    >
-                    </el-input>
-                    <el-button v-else class="button-new-tag" size="small" @click="showInput">+ 添加规格</el-button>
-                    <div style="color:red">&nbsp;&nbsp;注：规格名称与价格之间以,间隔如：规格,199(英文逗号);输入后按回车键即可添加</div>
-                </el-form-item>
-                <el-form-item label="排序">
-                    <el-input v-model="form.sort" style="width:150px"></el-input>
-                    <span style="color:red">&nbsp;&nbsp;注：数值越大展示越靠前，不输入则默认排序</span>
-                </el-form-item>
-                <el-form-item label="商品详情">
-                    <quill-editor ref="myTextEditor" v-model="form.details" :options="editorOption"></quill-editor>
-                    <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
-                </el-form-item>
-                <!--<el-form-item label="日期">-->
-                    <!--<el-date-picker type="date" placeholder="选择日期" v-model="form.b_datetime" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>-->
-                <!--</el-form-item>-->
-            </el-form>
+                        <el-form-item label="上架">
+                            <el-switch v-model="form.isup"></el-switch>
+                        </el-form-item>
+                        <el-form-item label="热门爆品">
+                            <el-switch v-model="form.hot"></el-switch>
+                        </el-form-item>
+                        <el-form-item label="商家推荐">
+                            <el-switch v-model="form.isrecomd"></el-switch>
+                        </el-form-item>
+                        <el-form-item label="商品规格" prop="specs">
+                            <el-tag
+                                    :key="tag.id"
+                                    v-for="tag in form.specs"
+                                    closable
+                                    size="medium"
+                                    :disable-transitions="false"
+                                    @close="handleClose(tag)">
+                                {{tag.title}}({{tag.price}})
+                            </el-tag>
+                            <el-input
+                                    class="input-new-tag"
+                                    v-if="inputVisible"
+                                    v-model="inputValue"
+                                    ref="saveTagInput"
+                                    size="medium"
+                                    @keyup.enter.native="handleInputConfirm"
+                                    @blur="handleInputConfirm"
+                            >
+                            </el-input>
+                            <el-button v-else class="button-new-tag" size="small" @click="showInput">+ 添加规格</el-button>
+                            <div style="color:red">&nbsp;&nbsp;注：规格名称与价格之间以,间隔如：规格,199(英文逗号);输入后按回车键即可添加</div>
+                        </el-form-item>
+                        <el-form-item label="排序">
+                            <el-input v-model="form.sort" style="width:150px"></el-input>
+                            <span style="color:red">&nbsp;&nbsp;注：数值越大展示越靠前，不输入则默认排序</span>
+                        </el-form-item>
+                        <el-form-item label="商品详情">
+                            <quill-editor ref="myTextEditor" v-model="form.details" :options="editorOption"></quill-editor>
+                            <!--<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>-->
+                        </el-form-item>
+                        <!--<el-form-item label="日期">-->
+                        <!--<el-date-picker type="date" placeholder="选择日期" v-model="form.b_datetime" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>-->
+                        <!--</el-form-item>-->
+                    </el-form>
+                </el-tab-pane>
+                <!--秒杀-->
+                <el-tab-pane label="秒杀编辑" name="second">
+                    <el-form ref="form" :rules="rules" :model="form" label-width="100px">
+                        <el-form-item label="秒杀">
+                            <el-switch v-model="form.isseckill"></el-switch>
+                        </el-form-item>
+                        <el-form-item label="原价">
+                            <el-input v-model="form.beforeprice" style="width:150px" placeholder="请输入原价"></el-input>
+                        </el-form-item>
+                        <el-form-item label="秒杀价格">
+                            <el-input v-model="form.seckillprice" style="width:150px" placeholder="请输入秒杀价格"></el-input>
+                        </el-form-item>
+                        <el-form-item label="开始时间">
+                            <el-col :span="11">
+                                <el-date-picker type="datetime" placeholder="选择开始时间" value-format="yyyy-MM-dd-HH-mm-ss" v-model="form.startdatetime" style="width: 50%;"></el-date-picker>
+                            </el-col>
+                        </el-form-item>
+                        <el-form-item label="结束时间">
+                            <el-col :span="11">
+                                <el-date-picker type="datetime" placeholder="选择结束时间" value-format="yyyy-MM-dd-HH-mm-ss" v-model="form.enddatetime" style="width: 50%;"></el-date-picker>
+                            </el-col>
+                        </el-form-item>
+
+
+                    </el-form>
+                </el-tab-pane>
+                <el-tab-pane label="砍价编辑" name="third">正在开发中...</el-tab-pane>
+            </el-tabs>
+
+
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">取 消</el-button>
                 <el-button type="primary" @click="saveEdit('form')">确 定</el-button>
@@ -265,9 +301,14 @@
                     category: '',
                     isup: '',
                     hot: '',
+                    isrecomd: '',
                     details: '',
                     sort: '',
                     datetime: '',
+                    isseckill: '',
+                    seckillprice: '',
+                    startdatetime: '',
+                    enddatetime: '',
                 },
                 idx: -1,
                 dialogVisible: false,
@@ -320,6 +361,8 @@
                 inputVisible: false,
                 inputValue: '',
                 loading:false, //加载中
+                activeName: 'first',  //默认选中tab
+                tabPosition: 'left',  //tab显示位置
             }
         },
         created() {
@@ -350,6 +393,9 @@
         methods: {
             onEditorChange({ editor, html, text }) {
                 this.form.details = html;
+            },
+            handleClick(tab, event) {
+                // console.log(tab, event);
             },
             //删除图片
             handleRemove(file, fileList) {
@@ -493,10 +539,15 @@
                         category: null,
                         isup: null,
                         hot: null,
+                        isrecomd: null,
                         details: null,
                         sort: null,
                         datetime: null,
                         swiperimgTemp: [],
+                        isseckill: null,
+                        seckillprice: null,
+                        startdatetime: null,
+                        enddatetime: null,
                     };
                 }
                 if(index!=undefined && row!=undefined){
@@ -517,12 +568,18 @@
                         category: item.category,
                         isup: item.isup,
                         hot: item.hot,
+                        isrecomd: item.isrecomd,
                         details: this.escapeStringHTML(item.details),
                         sort: item.sort,
                         datetime: item.datetime,
                         swiperimgTemp: item.swiperimg ? item.swiperimg.split(',') : [],
+                        isseckill: item.isseckill,
+                        seckillprice: item.seckillprice,
+                        startdatetime: item.startdatetime,
+                        enddatetime: item.enddatetime,
                     };
                 }
+                this.activeName = "first";  //默认选中第一个Tab
                 this.editVisible = true;
                 console.log(this.form);
             },
@@ -564,9 +621,14 @@
                                 categoryid: this.form.categoryid,
                                 isup: this.form.isup ? 1 : 0,
                                 hot: this.form.hot ? 1 : 0,
+                                isrecomd: this.form.isrecomd ? 1 : 0,
                                 specs: JSON.stringify(this.form.specs),
                                 sort: this.form.sort,
                                 details: this.escapeStringHTML(this.form.details),
+                                isseckill: this.form.isseckill ? 1 : 0,
+                                seckillprice: this.form.seckillprice,
+                                startdatetime: this.form.startdatetime,
+                                enddatetime: this.form.enddatetime,
                             });
                         }else{
                             params=this.$qs.stringify({
@@ -580,26 +642,36 @@
                                 categoryid: this.form.categoryid,
                                 isup: this.form.isup ? 1 : 0,
                                 hot: this.form.hot ? 1 : 0,
+                                isrecomd: this.form.isrecomd ? 1 : 0,
                                 specs: JSON.stringify(this.form.specs),
                                 sort: this.form.sort,
                                 details: this.escapeStringHTML(this.form.details),
+                                isseckill: this.form.isseckill ? 1 : 0,
+                                seckillprice: this.form.seckillprice,
+                                startdatetime: this.form.startdatetime,
+                                enddatetime: this.form.enddatetime,
                             });
                         }
-                        console.log({
-                            id: this.form.id,
-                            name: this.form.name,
-                            title: this.form.title,
-                            thumbnail: this.form.thumbnail,
-                            swiperimg: this.form.swiperimgTemp.join(','),
-                            beforeprice: this.form.beforeprice,
-                            salenumber: this.form.salenumber,
-                            categoryid: this.form.categoryid,
-                            isup: this.form.isup ? 1 : 0,
-                            hot: this.form.hot ? 1 : 0,
-                            specs: JSON.stringify(this.form.specs),
-                            sort: this.form.sort,
-                            details: this.escapeStringHTML(this.form.details),
-                        });
+                        // console.log({
+                        //     id: this.form.id,
+                        //     name: this.form.name,
+                        //     title: this.form.title,
+                        //     thumbnail: this.form.thumbnail,
+                        //     swiperimg: this.form.swiperimgTemp.join(','),
+                        //     beforeprice: this.form.beforeprice,
+                        //     salenumber: this.form.salenumber,
+                        //     categoryid: this.form.categoryid,
+                        //     isup: this.form.isup ? 1 : 0,
+                        //     hot: this.form.hot ? 1 : 0,
+                        //     isrecomd: this.form.isrecomd ? 1 : 0,
+                        //     specs: JSON.stringify(this.form.specs),
+                        //     sort: this.form.sort,
+                        //     details: this.escapeStringHTML(this.form.details),
+                        //     isseckill: this.form.isseckill ? 1 : 0,
+                        //     seckillprice: this.form.seckillprice,
+                        //     startdatetime: this.form.startdatetime,
+                        //     enddatetime: this.form.enddatetime,
+                        // });
                         // return;
                         this.$api.post('ShopCommodity/saveCommodity', params, res => {
                             this.getData();

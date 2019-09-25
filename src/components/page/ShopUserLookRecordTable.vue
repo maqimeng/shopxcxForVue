@@ -2,53 +2,60 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 优惠券管理</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 用户浏览记录</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
             <div class="handle-box">
                 <!--<el-button type="danger" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>-->
                 <!--<el-select v-model="select_cate" placeholder="筛选省份" class="handle-select mr10">-->
-                <!--<el-option key="1" label="广东省" value="广东省"></el-option>-->
-                <!--<el-option key="2" label="湖南省" value="湖南省"></el-option>-->
+                    <!--<el-option key="1" label="广东省" value="广东省"></el-option>-->
+                    <!--<el-option key="2" label="湖南省" value="湖南省"></el-option>-->
                 <!--</el-select>-->
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
-                <el-button type="primary" style="float: right" @click="handleEdit(undefined, undefined, 1)">添加</el-button>
+                <!--<el-button type="primary" style="float: right" @click="handleEdit(undefined, undefined, 1)">添加</el-button>-->
             </div>
             <el-table :data="data" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>
-                <el-table-column prop="title" align="center" label="优惠券名称">
+                <el-table-column prop="nickname" align="left" label="微信昵称" :show-overflow-tooltip='true'>
                 </el-table-column>
-                <el-table-column prop="full" align="center" label="满">
-                </el-table-column>
-                <el-table-column prop="reduce" align="center" label="减">
-                </el-table-column>
-                <el-table-column prop="number" align="center" label="数量">
-                </el-table-column>
-                <el-table-column prop="startdate" label="开始日期" align="center" sortable>
-                </el-table-column>
-                <el-table-column prop="enddate" label="结束日期" align="center" sortable>
-                </el-table-column>
-
-                <el-table-column prop="isup" align="center" label="上架">
-                    <template slot-scope="scope">
-                        <div v-if="scope.row.isup" style="color:#409EFF">是</div>
-                        <div v-else style="color:red">否</div>
+                <el-table-column prop="avatarurl"  align="center" label="微信头像">
+                    <template   slot-scope="scope">
+                        <el-popover
+                                placement="left"
+                                title=""
+                                width="500"
+                                trigger="hover">
+                            <img :src="scope.row.avatarurl" style="max-width: 100%" />
+                            <img slot="reference" :src="scope.row.avatarurl" :alt="scope.row.avatarurl" style="max-width: 130px; height: auto; max-height: 100px">
+                        </el-popover>
+                        <!--<img :src="scope.row.b_image"  min-width="70" height="70" />-->
                     </template>
                 </el-table-column>
-                <el-table-column prop="sort" align="center" label="排序">
+                <el-table-column prop="gender" align="center" label="性别">
+                    <template slot-scope="scope">
+                        <div v-if="scope.row.gender==1">男</div>
+                        <div v-else>女</div>
+                    </template>
                 </el-table-column>
-
-                <el-table-column prop="datetime" label="创建时间" width="180" align="center" sortable>
+                <el-table-column prop="province" align="center" label="省份">
                 </el-table-column>
-                <el-table-column label="操作" align="center">
-                <template slot-scope="scope">
-                <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row, 2)">编辑</el-button>
-                <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                </template>
+                <el-table-column prop="city" label="城市" align="center">
                 </el-table-column>
+                <el-table-column prop="tel" align="center" label="电话号码">
+                </el-table-column>
+                <el-table-column prop="name" align="center" label="浏览日记标题" :show-overflow-tooltip='true'>
+                </el-table-column>
+                <el-table-column prop="datetime" label="浏览时间" align="center" sortable>
+                </el-table-column>
+                <!--<el-table-column label="操作" align="center">-->
+                    <!--<template slot-scope="scope">-->
+                        <!--<el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row, 2)">查看详情</el-button>-->
+                        <!--&lt;!&ndash;<el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>&ndash;&gt;-->
+                    <!--</template>-->
+                <!--</el-table-column>-->
             </el-table>
             <div class="pagination">
                 <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="sumPage">
@@ -59,45 +66,120 @@
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-loading="loading" :visible.sync="editVisible" width="70%">
             <el-form ref="form" :rules="rules" :model="form" label-width="130px">
-                <el-form-item label="优惠券名称" prop="title">
-                    <el-input v-model="form.title" style="width:400px" placeholder="请输入优惠券名称"></el-input>
+                <el-form-item label="订单号">
+                    <el-input v-model="form.ordernumber" :disabled="true" style="width:400px"></el-input>
                 </el-form-item>
-                <el-form-item label="满" prop="full">
-                    <el-input v-model="form.full" style="width:400px" placeholder="请输入满足使用金额"></el-input>
+                <!--<el-form-item label="头像">-->
+                    <!--<el-upload-->
+                            <!--class="avatar-uploader"-->
+                            <!--name="image"-->
+                            <!--with-credentials-->
+                            <!--list-type="picture-card"-->
+                            <!--:data="{id:this.form.headerimg}"-->
+                            <!--:action="uploadUrl()"-->
+                            <!--:on-error="uploadError"-->
+                            <!--:on-success="handleAvatarSuccess"-->
+                            <!--:before-upload="beforeAvatarUpload"-->
+                            <!--:on-progress="uploading"-->
+                            <!--:show-file-list="false"-->
+                            <!--:auto-upload="true"-->
+                            <!--enctype="multipart/form-data">-->
+                        <!--<img v-if="form.b_image" :src="form.b_image" class="avatar">-->
+                        <!--<i v-else class="el-icon-plus"></i>-->
+                    <!--</el-upload>-->
+                <!--</el-form-item>-->
+                <!--<el-form-item label="示例图">-->
+                    <!--&lt;!&ndash;<img v-for="item in form.swiperimgList" :src="item">&ndash;&gt;-->
+                    <!--<el-upload-->
+                            <!--class="avatar-uploader"-->
+                            <!--name="image"-->
+                            <!--with-credentials-->
+                            <!--list-type="picture-card"-->
+                            <!--:data="{id:null}"-->
+                            <!--:action="uploadUrl()"-->
+                            <!--:on-error="uploadError"-->
+                            <!--:on-success="handleAvatarSuccess2"-->
+                            <!--:before-upload="beforeAvatarUpload"-->
+                            <!--:on-progress="uploading"-->
+                            <!--:auto-upload="true"-->
+                            <!--:on-preview="handlePictureCardPreview"-->
+                            <!--:on-remove="handleRemove"-->
+                            <!--:file-list="this.form.imglistUrl"-->
+                            <!--enctype="multipart/form-data">-->
+
+                        <!--&lt;!&ndash;<i v-else class="el-icon-plus avatar-uploader-icon"></i>&ndash;&gt;-->
+                        <!--<i class="el-icon-plus"></i>-->
+                    <!--</el-upload>-->
+                    <!--<el-dialog :visible.sync="isShowBigImg" :append-to-body="true" width="60%" top="10vh">-->
+                        <!--<img width="100%" :src="dialogImageUrl" alt="">-->
+                    <!--</el-dialog>-->
+                <!--</el-form-item>-->
+                <el-form-item label="用户昵称">
+                    <el-input v-model="form.nickname" style="width:400px" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="减" prop="reduce">
-                    <el-input v-model="form.reduce" style="width:400px" placeholder="请输入优惠金额"></el-input>
+                <el-form-item label="联系电话">
+                    <el-input v-model="form.tel" style="width:400px" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="数量" prop="number">
-                    <el-input v-model="form.number" style="width:400px" placeholder="请输入优惠券数量"></el-input>
+                <el-form-item label="备注">
+                    <el-input type="textarea" style="width:600px;" :rows="4" :disabled="true" v-model="form.remarks"></el-input>
                 </el-form-item>
 
-                <el-form-item label="开始日期" prop="startdate">
-                    <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择开始日期" value-format="yyyy-MM-dd" v-model="form.startdate" style="width: 50%;"></el-date-picker>
-                    </el-col>
+                <el-form-item label="积分金额">
+                    <el-input v-model="form.sumintegral" style="width:400px" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="结束日期" prop="enddate">
-                    <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择结束日期" value-format="yyyy-MM-dd" v-model="form.enddate" style="width: 50%;"></el-date-picker>
-                    </el-col>
+
+
+                <el-form-item label="下单时间">
+                    <el-input v-model="form.datetime" style="width:400px" :disabled="true"></el-input>
                 </el-form-item>
-                <el-form-item label="上架">
-                    <el-switch v-model="form.isup"></el-switch>
+                <el-form-item label="商品明细">
+                    <el-table :data="form.goods" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+                        <el-table-column prop="title" align="center" label="商品名称"></el-table-column>
+                        <el-table-column prop="thumbnail"  align="center" label="商品图片">
+                            <template   slot-scope="scope">
+                                <el-popover
+                                        placement="left"
+                                        title=""
+                                        width="500"
+                                        trigger="hover">
+                                    <img :src="scope.row.thumbnail" style="max-width: 100%" />
+                                    <img slot="reference" :src="scope.row.thumbnail" :alt="scope.row.thumbnail" style="max-width: 130px; height: auto; max-height: 100px">
+                                </el-popover>
+                                <!--<img :src="scope.row.b_image"  min-width="70" height="70" />-->
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="sumintegral" align="center" label="积分金额">
+                        </el-table-column>
+
+                        <!--<el-table-column prop="sumprice" align="center" label="订单金额">-->
+                        <!--</el-table-column>-->
+
+
+
+                    </el-table>
                 </el-form-item>
-                <el-form-item label="排序">
-                    <el-input v-model="form.sort" style="width:150px" placeholder="请输入排序"></el-input>
-                    <span style="color:red">&nbsp;&nbsp;注：数值越大展示越靠前，不输入则默认排序</span>
-                </el-form-item>
-                <el-form-item label="可用于商品">
-                    <el-checkbox-group v-model="type">
-                        <el-checkbox v-for="item in goodsList" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
-                    </el-checkbox-group>
-                </el-form-item>
+                <!--<el-form-item label="点赞量" prop="fabulousnumber">-->
+                    <!--<el-input v-model="form.fabulousnumber" style="width:150px" placeholder="请输入点赞量"></el-input>-->
+                <!--</el-form-item>-->
+
+                <!--<el-form-item label="是否在首页显示">-->
+                    <!--<el-switch v-model="form.ishome"></el-switch>-->
+                <!--</el-form-item>-->
+                <!--<el-form-item label="排序">-->
+                    <!--<el-input v-model="form.sort" style="width:150px"></el-input>-->
+                    <!--<span style="color:red">&nbsp;&nbsp;注：数值越大展示越靠前，不输入则默认排序</span>-->
+                <!--</el-form-item>-->
+                <!--<el-form-item label="商品详情">-->
+                    <!--<quill-editor ref="myTextEditor" v-model="form.details" :options="editorOption"></quill-editor>-->
+                    <!--&lt;!&ndash;<el-button class="editor-btn" type="primary" @click="submit">提交</el-button>&ndash;&gt;-->
+                <!--</el-form-item>-->
+                <!--<el-form-item label="日期">-->
+                    <!--<el-date-picker type="date" placeholder="选择日期" v-model="form.b_datetime" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>-->
+                <!--</el-form-item>-->
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisible = false">关 闭</el-button>
-                <el-button type="primary" @click="saveEdit('form')">确 定</el-button>
+                <!--<el-button type="primary" @click="saveEdit('form')">确 定</el-button>-->
             </span>
         </el-dialog>
 
@@ -140,40 +222,24 @@
                 delVisible: false,
                 form: {
                     id: '',
-                    title: '',
-                    goodsid: '',
-                    full: '',
-                    reduce: '',
-                    number: '',
-                    startdate: '',
-                    enddate: '',
-                    isup: false,
-                    sort: '',
+                    nickname: '',
+                    avatarurl: '',
+                    gender: '',
+                    province: '',
+                    city: '',
+                    tel: '',
+                    name: '',
                     datetime: '',
-                    goodList: [],
                 },
                 idx: -1,
                 dialogVisible: false,
                 AddOrSave:'',  //1表示添加，2表示更新
                 rules: {
-                    title: [
-                        { required: true, message: '输入优惠券名称', trigger: 'blur' }
-                    ],
-                    full: [
-                        { required: true, message: '输入满足使用金额', trigger: 'blur' }
-                    ],
-                    reduce: [
-                        { required: true, message: '输入优惠金额', trigger: 'blur' }
-                    ],
-                    startdate: [
-                        { required: true, message: '选择开始日期', trigger: 'blur' }
-                    ],
-                    enddate: [
-                        { required: true, message: '选择结束日期', trigger: 'blur' }
-                    ],
+
                 },
                 dialogImageUrl: '',
                 isShowBigImg: false,
+                caseList:[],  //日记分类列表
                 // 富文本框参数设置
                 editorOption: {
                     modules: {
@@ -199,8 +265,6 @@
                 inputVisible: false,
                 inputValue: '',
                 loading:false, //加载中
-                goodsList:[],  //菜单列表
-                type: [],  //被选中的菜单列表
             }
         },
         created() {
@@ -320,7 +384,7 @@
                     number: this.number,
                 });
                 // console.log(params);
-                this.$api.post('ShopCoupon/getCouponList', params, res => {
+                this.$api.post('ShopUserLookRecord/getUserLookRecordList', params, res => {
                     this.tableData = res.data.list;
                     this.sumPage = res.data.sumPage*10;
                     this.cur_page = res.data.currentPage;
@@ -348,46 +412,33 @@
                 return row.tag === value;
             },
             handleEdit(index, row, status) {
-                //获取商品列表
-                this.getGoodsList();
                 this.AddOrSave=status;
                 //如果是添加则把form清空
                 if(status==1){
                     this.form = {
-                        id: '',
-                        title: '',
-                        goodsid: '',
-                        full: '',
-                        reduce: '',
-                        number: '',
-                        startdate: '',
-                        enddate: '',
-                        isup: false,
-                        sort: '',
-                        goodList: [],
+                        id: null,
+                        ordernumber: null,
+                        nickname: null,
+                        tel: null,
+                        remarks: null,
+                        sumintegral: null,
+                        goods: [],
+                        datetime: null,
                     };
-                    this.type=[];
                 }
                 if(index!=undefined && row!=undefined){
                     this.idx = index;
                     const item = this.tableData[index];
                     this.form = {
                         id: item.id,
-                        title: item.title,
-                        goodsid: item.goodsid,
-                        full: item.full,
-                        reduce: item.reduce,
-                        number: item.number,
-                        startdate: item.startdate,
-                        enddate: item.enddate,
-                        isup: item.isup,
-                        sort: item.sort,
-                        goodList: item.goodList,
+                        ordernumber: item.ordernumber,
+                        nickname: item.nickname,
+                        tel: item.tel,
+                        remarks: item.remarks,
+                        sumintegral: item.sumintegral,
+                        goods: item.goods,
+                        datetime: item.datetime,
                     };
-                    this.type=[];
-                    for(var i=0;i<row.goodList.length;i++){
-                        this.type.push(row.goodList[i]['id']);
-                    }
                 }
                 this.editVisible = true;
                 console.log(this.form);
@@ -421,44 +472,52 @@
                         //1表示添加，2表示更新
                         if(this.AddOrSave==1){
                             params=this.$qs.stringify({
-                                title: this.form.title,
-                                goodsid: this.type.join(','),
-                                full: this.form.full,
-                                reduce: this.form.reduce,
-                                number: this.form.number,
-                                startdate: this.form.startdate,
-                                enddate: this.form.enddate,
-                                isup: this.form.isup ? 1 : 0,
-                                sort: this.form.sort ? this.form.sort : 0,
+                                name: this.form.name,
+                                headerimg: this.form.headerimg,
+                                imglist: this.form.imglistTemp.join(','),
+                                remarks: this.form.remarks,
+                                doctor: this.form.doctor,
+                                casemenuid: this.form.casemenuid,
+                                address: this.form.address,
+                                looknumber: this.form.looknumber,
+                                fabulousnumber: this.form.fabulousnumber,
+                                details: this.escapeStringHTML(this.form.details),
+                                sort: this.form.sort,
+                                ishome: this.form.ishome ? 1 : 0,
                             });
                         }else{
                             params=this.$qs.stringify({
                                 id: this.form.id,
-                                title: this.form.title,
-                                goodsid: this.type.join(','),
-                                full: this.form.full,
-                                reduce: this.form.reduce,
-                                number: this.form.number,
-                                startdate: this.form.startdate,
-                                enddate: this.form.enddate,
-                                isup: this.form.isup ? 1 : 0,
-                                sort: this.form.sort ? this.form.sort : 0,
+                                name: this.form.name,
+                                headerimg: this.form.headerimg,
+                                imglist: this.form.imglistTemp.join(','),
+                                remarks: this.form.remarks,
+                                doctor: this.form.doctor,
+                                casemenuid: this.form.casemenuid,
+                                address: this.form.address,
+                                looknumber: this.form.looknumber,
+                                fabulousnumber: this.form.fabulousnumber,
+                                details: this.escapeStringHTML(this.form.details),
+                                sort: this.form.sort,
+                                ishome: this.form.ishome ? 1 : 0,
                             });
                         }
-                        // console.log({
-                        //     id: this.form.id,
-                        //     title: this.form.title,
-                        //     goodsid: this.type.join(','),
-                        //     full: this.form.full,
-                        //     reduce: this.form.reduce,
-                        //     number: this.form.number,
-                        //     startdate: this.form.startdate,
-                        //     enddate: this.form.enddate,
-                        //     isup: this.form.isup ? 1 : 0,
-                        //     sort: this.form.sort ? this.form.sort : 0,
-                        // });
-
-                        this.$api.post('ShopCoupon/saveCoupon', params, res => {
+                        console.log({
+                            id: this.form.id,
+                            name: this.form.name,
+                            headerimg: this.form.headerimg,
+                            imglist: this.form.imglistTemp.join(','),
+                            remarks: this.form.remarks,
+                            doctor: this.form.doctor,
+                            casemenuid: this.form.casemenuid,
+                            address: this.form.address,
+                            looknumber: this.form.looknumber,
+                            fabulousnumber: this.form.fabulousnumber,
+                            details: this.escapeStringHTML(this.form.details),
+                            sort: this.form.sort,
+                            ishome: this.form.ishome ? 1 : 0,
+                        });
+                        this.$api.post('ShopCase/saveCase', params, res => {
                             this.getData();
                             this.$message.success(res.msg);
                             console.log(res);
@@ -480,7 +539,7 @@
                 });
                 console.log(params);
                 // return;
-                this.$api.post('ShopCoupon/deleteCoupon', params, res => {
+                this.$api.post('ShopCase/deleteCase', params, res => {
                     this.getData();
                     this.$message.success(res.msg+res.data+"条数据");
                 }, err => {
@@ -505,13 +564,21 @@
                 // console.log(this.selectedStatus);
                 this.getData();
             },
-            //获取商品列表
-            getGoodsList(){
-                this.$api.post('ShopCoupon/getGoodsList', null, res => {
-                    this.goodsList=res.data;
+            refund(){
+                var params=this.$qs.stringify({
+                    id: this.form.id
+                });
+                // console.log(params);
+                this.$api.post('ShopOrder/saveOrderStatus', params, res => {
+                    console.log(res);
+                    this.form.status=5;
+                    this.$message.success("退款成功");
+                    this.getData();
                 }, err => {
+                    console.log(err);
                     this.$message.error(err.msg);
                 });
+
             },
         }
     }

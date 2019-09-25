@@ -40,7 +40,7 @@
                         <!--<img :src="scope.row.b_image"  min-width="70" height="70" />-->
                     </template>
                 </el-table-column>
-                <el-table-column prop="menuName" align="center" label="菜单权限">
+                <el-table-column prop="menuName" :show-overflow-tooltip='true' align="center" label="菜单权限">
                 </el-table-column>
                 <el-table-column prop="datetime"  align="center" label="更新时间" sortable width="155">
                 </el-table-column>
